@@ -1,27 +1,39 @@
 import argparse
-import scapy.all as scapy
+import subprocess
+
+
+def traceroute(ip_address, progressive=False, output_file=None):
+    cmd = ['traceroute', ip_address]
+
+    try:
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+
+        results = []
+        for line in process.stdout:
+            print(line.strip())
+            results.append(line.strip())
+
+            if progressive:
+                input("Appuyez sur Entrée pour continuer...")
+
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write('\n'.join(results))
+                print(f"Résultats enregistrés dans '{output_file}'")
+
+    except Exception as e:
+        print(f"Erreur : {e}")
+
 
 def main():
-    parser = argparse.ArgumentParser(description="trace the route of the ip address specifie")
-    parser.add_argument("ip_address", type=str, help="the ip address to trace")
-    parser.add_argument("-p", "--progressive", action="store_true")
-    parser.add_argument("-o", "--output-file", type=str, help="the output file")
+    parser = argparse.ArgumentParser(description="Traceroute pour une adresse IP spécifiée.")
+    parser.add_argument("ip_address", type=str, help="L'adresse IP à tracer.")
+    parser.add_argument("-p", "--progressive", action="store_true", help="Activer l'exécution progressive.")
+    parser.add_argument("-o", "--output-file", type=str, help="Fichier dans lequel enregistrer les résultats.")
 
     args = parser.parse_args()
-    ip_address = args.ip_address
-    output_file = args.output
-
-    if args.progressive:
-        pass                            #ajouter une execution progressive
-
-    if output_file:
-        try:
-            with open(output_file, "w") as f:
-                f.write(ip_address)
-            print(f"Fichier '{output_file}' créé avec succès, contenant l'adresse IP.")
-        except Exception as e:
-            print(f"Error in the creation of the file : {e}")
+    traceroute(args.ip_address, args.progressive, args.output_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
