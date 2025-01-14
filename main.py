@@ -8,21 +8,31 @@ def traceroute(ip_address, progressive=False, output_file=None):
     try:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
 
+        resultsOut = []
         results = []
         for line in process.stdout:
-            print(line.strip())
+            tab = line.split()
+            print(tab[2])
             results.append(line.strip())
+            if tab[2] == '*':
+                continue
+            else:
+                resultsOut.append(tab[2])
 
             if progressive:
                 input("Appuyez sur Entrée pour continuer...")
 
         if output_file:
             with open(output_file, 'w') as f:
-                f.write('\n'.join(results))
+                f.write('\n'.join(resultsOut))
                 print(f"Résultats enregistrés dans '{output_file}'")
 
-    except Exception as e:
-        print(f"Erreur : {e}")
+    except TypeError as t:
+        print(f"Erreur : {t}")
+    except ValueError as v:
+        print(f"Erreur : {v}")
+
+
 
 
 def main():
